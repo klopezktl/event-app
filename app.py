@@ -1,4 +1,5 @@
 from flask import Flask, request
+from flask_smorest import abort
 from db import events
 import uuid
 
@@ -14,30 +15,42 @@ def get_events():
 @app.post("/event")
 def create_event():
     event_data = request.get_json()
-    event_id = uuid.uuid4().hex
-    event = {**event_data, "id": event_id}
-    events[event_id] = event
-    return event, 201
+
+    if(
+        "event_name" not in event_data
+        or "start_date" not in event_data
+        or "end_date" not in event_data
+    ):
+        abort(
+            400,
+            message="Bad request."
+        )
+    else:
+        event_id = uuid.uuid4().hex
+        event = {**event_data, "id": event_id}
+        events[event_id] = event
+        return event, 201
 
 # Update
 @app.put("/event/<string:event_id>")
 def update_event(event_id):
-    request_data = request.get_json()
-    if event_id not in events:
-        return {"message": "Event not found"}, 404
+    event_data = request.get_json()
 
-    event = events.get(event_id)
-    event['event_name'] = request_data['event_name']
-    event['start_date'] = request_data['start_date']
-    event['end_date'] = request_data['end_date']
-
-    return event, 201
+    try:
+        event = events[event_id]
+        event |= event_data
+        # event['event_name'] = event_data['event_name']
+        # event['start_date'] = event_data['start_date']
+        # event['end_date'] = event_data['end_date']
+        return event
+    except KeyError:
+        abort(404, message="Event not found")
 
 # Delete
-@app.post("/event/<string:event_id>")
+@app.delete("/event/<string:event_id>")
 def delete_event(event_id):
     try:
         del events[event_id]
         return events, 201
     except KeyError:
-        return {"message": "Event not found"}, 404
+        abort(404, message="Event not found")
