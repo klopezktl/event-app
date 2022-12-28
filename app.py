@@ -1,56 +1,19 @@
-from flask import Flask, request
-from flask_smorest import abort
-from db import events
-import uuid
+from flask import Flask
+from flask_smorest import Api
+from resources.event import blp as EventBlueprint
 
 app = Flask(__name__)
 
-# List
-@app.get("/event")
-def get_events():
-    # return {"events": list(events.values())}
-    return {"events": events}
+app.config['PROPAGATE_EXCEPTIONS'] = True
+app.config['API_TITLE'] = "Events REST API"
+app.config['API_VERSION'] = "v1"
+app.config['OPENAPI_VERSION'] = "3.0.3"
+app.config['OPENAPI_URL_PREFIX'] = "/"
+app.config['OPENAPI_SWAGGER_UI_PATH'] = "/swagger-ui"
+app.config[
+        "OPENAPI_SWAGGER_UI_URL"
+    ] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
 
-# Create
-@app.post("/event")
-def create_event():
-    event_data = request.get_json()
+api = Api(app)
 
-    if(
-        "event_name" not in event_data
-        or "start_date" not in event_data
-        or "end_date" not in event_data
-    ):
-        abort(
-            400,
-            message="Bad request."
-        )
-    else:
-        event_id = uuid.uuid4().hex
-        event = {**event_data, "id": event_id}
-        events[event_id] = event
-        return event, 201
-
-# Update
-@app.put("/event/<string:event_id>")
-def update_event(event_id):
-    event_data = request.get_json()
-
-    try:
-        event = events[event_id]
-        event |= event_data
-        # event['event_name'] = event_data['event_name']
-        # event['start_date'] = event_data['start_date']
-        # event['end_date'] = event_data['end_date']
-        return event
-    except KeyError:
-        abort(404, message="Event not found")
-
-# Delete
-@app.delete("/event/<string:event_id>")
-def delete_event(event_id):
-    try:
-        del events[event_id]
-        return events, 201
-    except KeyError:
-        abort(404, message="Event not found")
+api.register_blueprint(EventBlueprint)
