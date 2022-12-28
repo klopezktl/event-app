@@ -1,6 +1,7 @@
 from flask import request
 from flask_smorest import Blueprint, abort
 from flask.views import MethodView
+from schemas import EventSchema
 
 from db import events
 import uuid
@@ -9,8 +10,10 @@ blp = Blueprint("Events", __name__, description="Operations on events")
 
 @blp.route("/event/<string:event_id>")
 class Event(MethodView):
-    def put(self, event_id):
-        event_data = request.get_json()
+
+    @blp.arguments(EventSchema)
+    @blp.response(200, EventSchema)
+    def put(self, event_data, event_id):
         try:
             event = events[event_id]
             event |= event_data
@@ -30,28 +33,18 @@ class Event(MethodView):
 
 @blp.route("/event")
 class EventList(MethodView):
-
+    @blp.response(200, EventSchema(many=True))
     def get(self):
-        # return {"events": list(events.values())}
-        return {"events": events}
+        return events.values()
+        # return {"events": events}
 
-    def post(self):
-        event_data = request.get_json()
-
-        if(
-            "event_name" not in event_data
-            or "start_date" not in event_data
-            or "end_date" not in event_data
-        ):
-            abort(
-                400,
-                message="Bad request."
-            )
-        else:
-            event_id = uuid.uuid4().hex
-            event = {**event_data, "id": event_id}
-            events[event_id] = event
-            return event, 201
+    @blp.arguments(EventSchema)
+    @blp.response(200, EventSchema)
+    def post(self, event_data):
+        event_id = uuid.uuid4().hex
+        event = {**event_data, "id": event_id}
+        events[event_id] = event
+        return event, 201
 
 
 
