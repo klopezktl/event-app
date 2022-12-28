@@ -45,8 +45,9 @@ def update_event(event_code):
             event['event_name'] = request_data['event_name']
             event['start_date'] = request_data['start_date']
             event['end_date'] = request_data['end_date']
+            return events, 201
 
-    return events, 201
+    return {"message": "Event not found"}, 404
 
 # Delete
 @app.post("/event/<string:event_code>")
@@ -54,6 +55,6 @@ def delete_event(event_code):
     for i in range(len(events)):
         if events[i]['event_code'] == event_code:
             del events[i]
-            break
+            return events, 201
 
-    return events, 201
+    return {"message": "Event not found"}, 404
