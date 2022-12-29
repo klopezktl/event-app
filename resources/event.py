@@ -82,16 +82,16 @@ def check_if_time_in_range(date_time):
 
     return min_time <= current_time <= max_time
 
-def check_if_past_date(date_time):
+def check_if_future_date(date_time):
     date_now = datetime.now()
     date_time = datetime.strptime(date_time, DATETIME_FORMAT)
 
-    return True if date_time <= date_now else False
+    return True if date_time >= date_now else False
 
 def datetime_validations(start_date, end_date):
     start_date = start_date.strftime(DATETIME_FORMAT)
     end_date = end_date.strftime(DATETIME_FORMAT)
-    if not check_if_past_date(start_date) or not check_if_past_date(end_date):
+    if not check_if_future_date(start_date) or not check_if_future_date(end_date):
         abort(
             400,
             message="Invalid start_date or end_date"
