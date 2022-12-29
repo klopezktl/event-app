@@ -27,7 +27,6 @@ export class WebApiService {
     )
       .pipe(
         map((response: any) => this.ReturnResponseData(response)),
-        // console.log("## response: ", response)
         catchError(this.handleError)
       );
   }
@@ -80,7 +79,7 @@ export class WebApiService {
       }),
      observe: "response" as 'body'
     };
-    return this.httpClient.post(
+    return this.httpClient.put(
       url,
       model,
       httpOptions)

@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, Type } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-// import { ToastrService } from 'ngx-toastr';
+import { ToastrService } from 'ngx-toastr';
 import { HttpProviderService } from '../Service/http-provider.service';
 
 @Component({
@@ -37,17 +37,15 @@ export class HomeComponent implements OnInit {
   closeResult = '';
   eventList: any = [];
   constructor(private router: Router, private modalService: NgbModal,
-    // private toastr: ToastrService,
+    private toastr: ToastrService,
     private httpProvider : HttpProviderService) { }
 
   ngOnInit(): void {
     this.getAllEvent();
   }
   async getAllEvent() {
-    console.log("__TEST ")
     this.httpProvider.getAllEvent().subscribe((data : any) => {
 
-      console.log("## data: ", data)
       if (data != null) {
         var resultData = data;
         console.log("## resultData: ", resultData)
@@ -86,8 +84,7 @@ export class HomeComponent implements OnInit {
       if (data != null && data.body != null) {
         var resultData = data.body;
         if (resultData != null && resultData.isSuccess) {
-          // this.toastr.success(resultData.message);
-          console.log(resultData.message)
+          this.toastr.success(resultData.message);
           this.getAllEvent();
         }
       }

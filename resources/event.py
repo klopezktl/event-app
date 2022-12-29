@@ -15,9 +15,16 @@ blp = Blueprint("Events", __name__, description="Operations on events")
 @blp.route("/event/<string:event_id>")
 class Event(MethodView):
 
+    @blp.response(200, EventSchema)
+    def get(self, event_id):
+        event = EventModel.query.get_or_404(event_id)
+        return event
+
     @blp.arguments(EventSchema)
     @blp.response(200, EventSchema)
     def put(self, event_data, event_id):
+        print("## event_data: ", event_data)
+        print("## event_id: ", event_id)
         event = EventModel.query.get(event_id)
 
         # Validate start_date and end_date
@@ -92,11 +99,13 @@ def datetime_validations(start_date, end_date):
     start_date = start_date.strftime(DATETIME_FORMAT)
     end_date = end_date.strftime(DATETIME_FORMAT)
     if not check_if_future_date(start_date) or not check_if_future_date(end_date):
+        print("Invalid start_date or end_date")
         abort(
             400,
             message="Invalid start_date or end_date"
         )
     elif not check_if_time_in_range(start_date) or not check_if_time_in_range(end_date):
+        print("RANGE ERROR")
         abort(
             400,
             message="Event start_date or end_date is not within range"
@@ -107,6 +116,7 @@ def datetime_validations(start_date, end_date):
         )
         check_overlap = query.first()
         if check_overlap is not None:
+            print("OVERPAL")
             abort(
                 400,
                 message="Overlapping start_date or end_date"

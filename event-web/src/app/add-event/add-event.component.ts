@@ -24,10 +24,8 @@ export class AddEventComponent implements OnInit {
     if (isValid) {
       this.httpProvider.saveEvent(this.addEventForm).subscribe(async data => {
         if (data != null && data.body != null) {
-          console.log("## data: ", data)
           if (data != null  != null) {
             var resultData = data.body;
-            console.log("## resultData: ", resultData)
             if (resultData != null) {
               this.toastr.success(data.statusText);
               setTimeout(() => {
