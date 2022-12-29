@@ -16,17 +16,18 @@ export class WebApiService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type':  'application/json',
-        'Cache-Control' : 'no-cache',
-        'Pragma' : 'no-cache'
+        // 'Cache-Control' : 'no-cache',
+        // 'Pragma' : 'no-cache'
       }),
       observe: "response" as 'body'
     };
     return this.httpClient.get(
       url,
-      httpOptions
+      // httpOptions
     )
       .pipe(
         map((response: any) => this.ReturnResponseData(response)),
+        // console.log("## response: ", response)
         catchError(this.handleError)
       );
   }

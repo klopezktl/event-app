@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask
+from flask_cors import CORS
 from flask_smorest import Api
 from resources.event import blp as EventBlueprint
 
@@ -10,6 +11,7 @@ import models
 
 def create_app(db_url=None):
     app = Flask(__name__, instance_path=os.getcwd())
+    CORS(app)
 
     app.config['PROPAGATE_EXCEPTIONS'] = True
     app.config['API_TITLE'] = "Events REST API"

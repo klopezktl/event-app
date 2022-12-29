@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { WebApiService } from './web-api.service';
 
-var apiUrl = "http://localhost:8080/";
+var apiUrl = "http://localhost:8080";
+// var apiUrl = "http://127.0.0.1:8080"
 
 var httpLink = {
   getAllEvent: apiUrl + "/event",
@@ -17,6 +18,7 @@ export class HttpProviderService {
   constructor(private webApiService: WebApiService) { }
 
   public getAllEvent(): Observable<any> {
+    console.log("--> getAllEvent")
     return this.webApiService.get(httpLink.getAllEvent);
   }
   public deleteEventById(model: any): Observable<any> {
