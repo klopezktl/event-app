@@ -50,7 +50,6 @@ export class EditEventComponent implements OnInit {
         'end_date': this.editEventForm.end_date
       }
       this.httpProvider.updateEventById(this.eventId, updatedEventForm).subscribe(async data => {
-        console.log("## ata: ", data)
         if (data != null) {
           var resultData = data.body;
           if (resultData != null && data.ok) {

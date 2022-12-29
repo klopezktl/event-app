@@ -48,7 +48,6 @@ export class HomeComponent implements OnInit {
 
       if (data != null) {
         var resultData = data;
-        console.log("## resultData: ", resultData)
         if (resultData) {
           this.eventList = resultData;
         }
@@ -83,7 +82,7 @@ export class HomeComponent implements OnInit {
     this.httpProvider.deleteEventById(employee.id).subscribe((data : any) => {
       if (data != null && data.body != null) {
         var resultData = data.body;
-        if (resultData != null && resultData.isSuccess) {
+        if (resultData != null && data.ok) {
           this.toastr.success(resultData.message);
           this.getAllEvent();
         }

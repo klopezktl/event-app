@@ -36,7 +36,7 @@ export class AddEventComponent implements OnInit {
         }
       },
         async error => {
-          this.toastr.error(error.message);
+          this.toastr.error(error.error.message);
           setTimeout(() => {
             this.router.navigate(['/Home']);
           }, 500);
