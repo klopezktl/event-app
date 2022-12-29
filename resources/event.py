@@ -6,18 +6,11 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from db import db
 from models import EventModel
 from schemas import EventSchema
+from utils.contants.event import MIN_TIME, MAX_TIME, DATETIME_FORMAT, TIME_FORMAT
 
 from datetime import datetime
 
-from sqlalchemy.dialects import sqlite
-from sqlalchemy import and_
-
-import uuid
-
-
 blp = Blueprint("Events", __name__, description="Operations on events")
-MIN_TIME = "8:00"
-MAX_TIME = "16:00"
 
 @blp.route("/event/<string:event_id>")
 class Event(MethodView):
@@ -31,10 +24,12 @@ class Event(MethodView):
         datetime_validations(event_data['start_date'], event_data['end_date'])
 
         if event:
+            # Update
             event.event_name = event_data['event_name']
             event.start_date = event_data['start_date']
             event.end_date = event_data['end_date']
         else:
+            # Insert
             event = EventModel(id=event_id, **event_data)
 
         db.session.add(event)
@@ -76,22 +71,26 @@ class EventList(MethodView):
         return event, 201
 
 def check_if_time_in_range(date_time):
-    min_time = datetime.strptime(MIN_TIME, "%H:%M")
+    min_time = datetime.strptime(MIN_TIME, TIME_FORMAT)
     min_time = min_time.time()
 
-    max_time = datetime.strptime(MAX_TIME, "%H:%M")
+    max_time = datetime.strptime(MAX_TIME, TIME_FORMAT)
     max_time = max_time.time()
 
-    current_time = date_time.time()
+    current_time = datetime.strptime(date_time, DATETIME_FORMAT)
+    current_time = current_time.time()
 
     return min_time <= current_time <= max_time
 
 def check_if_past_date(date_time):
     date_now = datetime.now()
+    date_time = datetime.strptime(date_time, DATETIME_FORMAT)
 
     return True if date_time <= date_now else False
 
 def datetime_validations(start_date, end_date):
+    start_date = start_date.strftime(DATETIME_FORMAT)
+    end_date = end_date.strftime(DATETIME_FORMAT)
     if not check_if_past_date(start_date) or not check_if_past_date(end_date):
         abort(
             400,
@@ -103,9 +102,10 @@ def datetime_validations(start_date, end_date):
             message="Event start_date or end_date is not within range"
         )
     else:
-        check_overlap = EventModel.query.filter(
+        query = EventModel.query.filter(
             EventModel.start_date.between(str(start_date), str(end_date))
-        ).first()
+        )
+        check_overlap = query.first()
         if check_overlap is not None:
             abort(
                 400,
