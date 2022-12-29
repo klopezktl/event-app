@@ -8,7 +8,9 @@ Event App
 
 ## Getting started - WEB
 `cd event-web`
+
 `npm i`
+
 `ng serve`
 
 ## Swagger-ui api documentation
